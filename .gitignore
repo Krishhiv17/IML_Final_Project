@@ -172,3 +172,5 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+Datasets/flight_delay_data.csv
+Datasets/flight_delay_data_cleaned.csv
