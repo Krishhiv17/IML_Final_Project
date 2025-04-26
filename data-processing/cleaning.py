@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd #type: ignore
 
 # Load the dataset
 df = pd.read_csv("./Datasets/flight_delay_data.csv")
