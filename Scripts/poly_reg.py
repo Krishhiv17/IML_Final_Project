@@ -1,7 +1,7 @@
 import pandas as pd #type: ignore
 from sklearn.model_selection import train_test_split #type: ignore
-from sklearn.preprocessing import LabelEncoder, PolynomialFeatures #type: ignore
-from sklearn.linear_model import LinearRegression #type: ignore
+from sklearn.preprocessing import LabelEncoder, PolynomialFeatures, StandardScaler #type: ignore
+from sklearn.linear_model import SGDRegressor #type: ignore
 from sklearn.metrics import mean_squared_error, r2_score #type: ignore
 
 # Load dataset
@@ -28,18 +28,23 @@ y = df['ARR_DELAY']
 # Train/test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Polynomial feature transformation
-poly = PolynomialFeatures(degree=2)  # You can change the degree as needed
-X_train_poly = poly.fit_transform(X_train)
-X_test_poly = poly.transform(X_test)
+# Scale the data using StandardScaler
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# Train polynomial regression model
-poly_reg = LinearRegression()
-poly_reg.fit(X_train_poly, y_train)
+# Apply Polynomial transformation on scaled data
+poly = PolynomialFeatures(degree=2)  # You can adjust the degree as needed
+X_train_poly = poly.fit_transform(X_train_scaled)
+X_test_poly = poly.transform(X_test_scaled)
+
+# Train SGDRegressor model (stochastic gradient descent)
+sgd_regressor = SGDRegressor(max_iter=1000, tol=1e-3)
+sgd_regressor.fit(X_train_poly, y_train)
 
 # Predict on both training and test sets
-y_train_pred = poly_reg.predict(X_train_poly)
-y_test_pred = poly_reg.predict(X_test_poly)
+y_train_pred = sgd_regressor.predict(X_train_poly)
+y_test_pred = sgd_regressor.predict(X_test_poly)
 
 # Evaluate the model on training data
 train_mse = mean_squared_error(y_train, y_train_pred)

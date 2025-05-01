@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt #type: ignore
 df = pd.read_csv('./Datasets/feature_engineered_dataset.csv')
 
 # Drop unnecessary columns
-drop_cols = ['Unnamed: 0', 'FL_DATE', 'AIRLINE_DOT', 'AIRLINE_CODE', 'DOT_CODE', 
-             'ORIGIN_CITY', 'DEST_CITY', 'DEP_TIME', 'ARR_TIME', 'CANCELLED', 'DIVERTED', 'FL_NUMBER']
+drop_cols = ['Unnamed: 0', 'FL_DATE', 'AIRLINE_DOT', 'AIRLINE_CODE', 'DOT_CODE',
+             'ORIGIN_CITY', 'DEST_CITY', 'DEP_TIME', 'ARR_TIME', 'CANCELLED', 'DIVERTED', 'FL_NUMBER', 'TOTAL_KNOWN_DELAY_CAUSE', 'DEP_DELAY']
 df = df.drop(columns=drop_cols)
 
 # Encode categorical variables
@@ -58,7 +58,7 @@ early_stopping = EarlyStopping(
 
 history = model.fit(
     X_train, y_train, 
-    epochs=100,          # Increased max epochs so early stopping can kick in
+    epochs=100,
     batch_size=32, 
     validation_split=0.2, 
     callbacks=[early_stopping],
