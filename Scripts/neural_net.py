@@ -70,17 +70,23 @@ y_pred = model.predict(X_test)
 # Evaluation metrics
 mse = mean_squared_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
-accuracy = r2 * 100  # Accuracy in %
+accuracy = r2 * 100
 
-print(f"Neural Network MSE: {mse:.2f}")
-print(f"Neural Network R² Score: {r2:.4f}")
-print(f"Neural Network Accuracy: {accuracy:.2f}%")
+residuals = y_pred.flatten() - y_test.values
 
-plt.plot(history.history['loss'], label='Training Loss')
-plt.plot(history.history['val_loss'], label='Validation Loss')
-plt.title('Model Loss Over Epochs')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-plt.legend(loc='upper right')
+plt.figure(figsize=(8, 6))
+plt.scatter(y_pred, residuals, alpha=0.5)
+plt.hlines(0, xmin=y_pred.min(), xmax=y_pred.max(), colors='r', linestyles='dashed')
+plt.xlabel('Predicted ARR_DELAY')
+plt.ylabel('Residuals (Predicted − Actual)')
+plt.title('Residuals Plot')
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(8, 6))
+plt.hist(residuals, bins=50, edgecolor='black')
+plt.xlabel('Residual')
+plt.ylabel('Frequency')
+plt.title('Distribution of Residuals')
 plt.grid(True)
 plt.show()
