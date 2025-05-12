@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split # type: ignore
 from sklearn.metrics import mean_squared_error, r2_score # type: ignore
 from sklearn.preprocessing import LabelEncoder # type: ignore
 import matplotlib.pyplot as plt # type: ignore
+import networkx as nx # type: ignore
 
 df_raw = pd.read_csv('./Datasets/feature_engineered_dataset.csv')
 
@@ -45,18 +46,18 @@ print("Training Random Forest...")
 rf.fit(X_train, y_train)
 print("Training complete.")
 
-df_pred_input = df_hubs.drop(columns=drop_cols + ['ARR_DELAY'])
+df_all = df_raw.copy()
+df_pred_input = df_all.drop(columns=drop_cols + ['ARR_DELAY'])
 for col in categorical_cols:
     le = label_encoders[col]
     df_pred_input[col] = le.transform(df_pred_input[col])
 
-df_hubs['PREDICTED_ARR_DELAY'] = rf.predict(df_pred_input)
+df_all['PREDICTED_ARR_DELAY'] = rf.predict(df_pred_input)
 
-predicted_route_delay = df_hubs.groupby(['ORIGIN_CITY', 'DEST_CITY'])['PREDICTED_ARR_DELAY'].mean().reset_index()
-delay_graph = defaultdict(dict)
-for _, row in predicted_route_delay.iterrows():
-    origin, dest, delay = row['ORIGIN_CITY'], row['DEST_CITY'], row['PREDICTED_ARR_DELAY']
-    delay_graph[origin][dest] = delay
+graph = defaultdict(dict)
+predicted_delay_df = df_all.groupby(['ORIGIN_CITY', 'DEST_CITY'])['PREDICTED_ARR_DELAY'].mean().reset_index()
+for _, row in predicted_delay_df.iterrows():
+    graph[row['ORIGIN_CITY']][row['DEST_CITY']] = row['PREDICTED_ARR_DELAY']
 
 def recommend_two_leg_path(graph, origin, destination):
     if destination not in graph.get(origin, {}):
@@ -83,5 +84,25 @@ def recommend_two_leg_path(graph, origin, destination):
     else:
         return "No better 2-leg path found."
 
-result = recommend_two_leg_path(delay_graph, 'New York, NY', 'San Francisco, CA')
-print(result)
+def visualize_route(route_dict):
+    if isinstance(route_dict, str):
+        print(route_dict)
+        return
+    G = nx.DiGraph()
+    path = route_dict['recommended_path']
+    G.add_edge(path[0], path[1], weight=round(graph[path[0]][path[1]], 2))
+    G.add_edge(path[1], path[2], weight=round(graph[path[1]][path[2]], 2))
+    pos = nx.spring_layout(G, seed=42)
+    edge_labels = nx.get_edge_attributes(G, 'weight')
+    nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=3000, font_size=10, font_weight='bold')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+    plt.title("Recommended Two-Leg Flight Path")
+    plt.show()
+
+example1 = recommend_two_leg_path(graph, 'New York, NY', 'San Francisco, CA')
+print("\nExample 1:", example1)
+visualize_route(example1)
+
+example2 = recommend_two_leg_path(graph, 'Chicago, IL', 'Los Angeles, CA')
+print("\nExample 2:", example2)
+visualize_route(example2)

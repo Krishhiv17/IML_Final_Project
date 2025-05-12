@@ -27,7 +27,7 @@ label_encoders = {}
 for col in categorical_cols:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col])
-    label_encoders[col] = le  # Save the encoder for inverse transformation if needed
+    label_encoders[col] = le
 
 # Separate features and target
 X = df.drop(columns=['ARR_DELAY'])

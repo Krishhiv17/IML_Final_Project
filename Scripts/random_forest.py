@@ -4,6 +4,9 @@ from sklearn.ensemble import RandomForestRegressor #type: ignore
 from sklearn.metrics import mean_squared_error, r2_score #type: ignore
 from sklearn.preprocessing import LabelEncoder #type: ignore
 import matplotlib.pyplot as plt #type: ignore
+import seaborn as sns #type: ignore
+import numpy as np #type: ignore
+import scipy.stats as stats #type: ignore
 
 df = pd.read_csv('./Datasets/feature_engineered_dataset.csv')
 
@@ -18,7 +21,7 @@ label_encoders = {}
 for col in categorical_cols:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col])
-    label_encoders[col] = le  # Save encoders if you want to inverse transform later
+    label_encoders[col] = le
 
 X = df.drop(columns=['ARR_DELAY'])
 y = df['ARR_DELAY']
@@ -26,8 +29,8 @@ y = df['ARR_DELAY']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 rf = RandomForestRegressor(
-    n_estimators=100,    # Number of trees
-    max_depth=15,        # Limit tree depth to avoid overfitting
+    n_estimators=100,
+    max_depth=15,
     random_state=42,
     n_jobs=-1,
     verbose=1
@@ -55,8 +58,24 @@ print(f"Random Forest Test MSE: {test_mse:.2f}")
 print(f"Random Forest Test R² Score: {test_r2:.4f}")
 print(f"Random Forest Test Accuracy: {test_r2 * 100:.2f}%")
 
-# Metrics
 datasets = ['Training', 'Test']
-r2_scores = [train_r2 * 100, test_r2 * 100]  # Convert to %
+r2_scores = [train_r2 * 100, test_r2 * 100]
 mse_scores = [train_mse, test_mse]
 
+residuals = y_pred - y_test
+
+# Plot histogram of residuals
+plt.figure(figsize=(10, 5))
+sns.histplot(residuals, bins=50, kde=True, color='purple')
+plt.title('Distribution of Residuals (y_pred - y_test)')
+plt.xlabel('Residual')
+plt.ylabel('Frequency')
+plt.grid(True)
+plt.show()
+
+# Optional: Q-Q Plot to check normality
+plt.figure(figsize=(6, 6))
+stats.probplot(residuals, dist='norm', plot=plt)
+plt.title('Q-Q Plot of Residuals')
+plt.grid(True)
+plt.show()
