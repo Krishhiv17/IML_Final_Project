@@ -55,31 +55,8 @@ print(f"Random Forest Test MSE: {test_mse:.2f}")
 print(f"Random Forest Test R² Score: {test_r2:.4f}")
 print(f"Random Forest Test Accuracy: {test_r2 * 100:.2f}%")
 
-
-
 # Metrics
 datasets = ['Training', 'Test']
 r2_scores = [train_r2 * 100, test_r2 * 100]  # Convert to %
 mse_scores = [train_mse, test_mse]
 
-# Plot R² Score (Accuracy)
-plt.figure(figsize=(10, 5))
-
-plt.subplot(1, 2, 1)
-plt.bar(datasets, r2_scores, color=['skyblue', 'salmon'])
-plt.ylim(0, 100)
-plt.title('Random Forest Accuracy (R² %)')
-plt.ylabel('Accuracy (%)')
-for i, v in enumerate(r2_scores):
-    plt.text(i, v + 0.5, f"{v:.2f}%", ha='center', fontweight='bold')
-
-# Plot MSE
-plt.subplot(1, 2, 2)
-plt.bar(datasets, mse_scores, color=['skyblue', 'salmon'])
-plt.title('Random Forest MSE')
-plt.ylabel('Mean Squared Error')
-for i, v in enumerate(mse_scores):
-    plt.text(i, v + 0.5, f"{v:.2f}", ha='center', fontweight='bold')
-
-plt.tight_layout()
-plt.show()

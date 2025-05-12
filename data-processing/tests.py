@@ -4,7 +4,11 @@ import matplotlib.pyplot as plt #type: ignore
 
 df = pd.read_csv('./Datasets/feature_engineered_dataset.csv')
 
-correlation_with_target = df.corr(numeric_only=True)['ARR_DELAY'].sort_values(ascending=False)
-
-print("Correlation of features with ARR_DELAY:")
-print(correlation_with_target)
+plt.figure(figsize=(10, 6))
+plt.hist(df['ARR_DELAY'].dropna(), bins=100, color='skyblue', edgecolor='black')
+plt.title('Distribution of Arrival Delays')
+plt.xlabel('Arrival Delay (minutes)')
+plt.ylabel('Number of Flights')
+plt.xlim(-100, 300)  # Focused range to ignore outliers (adjust if needed)
+plt.grid(True)
+plt.show()
